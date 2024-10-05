@@ -3,16 +3,16 @@ import React from 'react'
 const TaskFilter = () => {
   return (
     <ul className="filters">
-        <li>
-          <button className="selected">All</button>
-        </li>
-        <li>
-          <button>Active</button>
-        </li>
-        <li>
-          <button>Completed</button>
-        </li>
-      </ul>
+      <li>
+        <button className="selected">All</button>
+      </li>
+      <li>
+        <button>Active</button>
+      </li>
+      <li>
+        <button>Completed</button>
+      </li>
+    </ul>
   )
 }
 
