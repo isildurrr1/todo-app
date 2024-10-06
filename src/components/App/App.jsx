@@ -21,6 +21,19 @@ export default class App extends Component {
     })
   }
 
+  completeItem = (id, checked) => {
+    this.setState(({ tasks }) => {
+      const newTasks = tasks.map((task) => {
+        if (task.id === id) {
+          const newState = checked ? { state: 'completed' } : { state: '' }
+          return Object.assign(task, newState)
+        }
+        return task
+      })
+      return { tasks: newTasks }
+    })
+  }
+
   render() {
     return (
       <section className="todoapp">
@@ -29,7 +42,11 @@ export default class App extends Component {
           <NewTaskForm />
         </header>
         <section className="main">
-          <TaskList data={this.state.tasks} onDeleted={(id) => this.deleteItem(id)} />
+          <TaskList
+            data={this.state.tasks}
+            onDeleted={(id) => this.deleteItem(id)}
+            onCheck={(id, checked) => this.completeItem(id, checked)}
+          />
           <Footer />
         </section>
       </section>
