@@ -2,7 +2,7 @@ import React from 'react'
 
 import Task from '../Task/Task'
 
-const TaskList = ({ data, filterState, onDeleted, onCheck }) => {
+const TaskList = ({ data, filterState, onEdit, onSaveEdit, onDeleted, onCheck }) => {
   return (
     <ul className="todo-list">
       {data
@@ -16,7 +16,16 @@ const TaskList = ({ data, filterState, onDeleted, onCheck }) => {
           return task
         })
         .map((task) => {
-          return <Task {...task} key={task.id} onDeleted={onDeleted} onCheck={onCheck} />
+          return (
+            <Task
+              {...task}
+              key={task.id}
+              onEdit={onEdit}
+              onSaveEdit={onSaveEdit}
+              onDeleted={onDeleted}
+              onCheck={onCheck}
+            />
+          )
         })}
     </ul>
   )

@@ -6,12 +6,34 @@ import NewTaskForm from '../NewTaskForm/NewTaskForm'
 
 export default class App extends Component {
   state = {
-    tasks: [
-      { name: 'Completed task', state: 'completed', date: 'created 17 seconds ago', id: 1 },
-      { name: 'Editing task', state: undefined, date: 'created 5 minutes ago', id: 2 },
-      { name: 'Active task', state: undefined, date: 'created 5 minutes ago', id: 3 },
-    ],
+    tasks: [],
     filter: 'all',
+  }
+
+  editTask = (id) => {
+    this.setState(({ tasks }) => {
+      const newTasks = tasks.map((task) => {
+        if (task.id === id) {
+          return Object.assign(task, { editing: true })
+        }
+        return task
+      })
+      return { tasks: newTasks }
+    })
+  }
+
+  saveEditedTask = (id, e) => {
+    if (e.code === 'Enter' && e.target.value.trim() !== '') {
+      this.setState(({ tasks }) => {
+        const newTasks = tasks.map((task) => {
+          if (task.id === id) {
+            return Object.assign(task, { name: e.target.value, editing: false })
+          }
+          return task
+        })
+        return { tasks: newTasks }
+      })
+    }
   }
 
   onFilterSelect = (newState) => {
@@ -29,14 +51,16 @@ export default class App extends Component {
   onInputSubmit = (e) => {
     if (e.code === 'Enter' && e.target.value.trim() !== '') {
       this.setState(({ tasks }) => {
+        const creationDate = new Date()
         const newTask = {
           name: e.target.value,
           state: undefined,
-          date: 'created 5 minutes ago',
+          editing: false,
+          date: creationDate,
           id: Math.floor(Math.random() * 1000),
         }
         e.target.value = ''
-        return { tasks: [...tasks, newTask] }
+        return tasks.length === 0 ? { tasks: [newTask] } : { tasks: [...tasks, newTask] }
       })
     }
   }
@@ -73,6 +97,8 @@ export default class App extends Component {
           <TaskList
             data={this.state.tasks}
             filterState={this.state.filter}
+            onEdit={(id) => this.editTask(id)}
+            onSaveEdit={(id, e) => this.saveEditedTask(id, e)}
             onDeleted={(id) => this.deleteItem(id)}
             onCheck={(id, checked) => this.completeItem(id, checked)}
           />
