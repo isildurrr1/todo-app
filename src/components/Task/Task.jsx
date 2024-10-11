@@ -1,7 +1,20 @@
 import React, { Component } from 'react'
 import { formatDistanceStrict } from 'date-fns'
+import PropTypes from 'prop-types'
 
 export default class Task extends Component {
+  static defaultProps = {
+    name: '',
+    state: undefined,
+    editing: false,
+    date: {},
+    id: undefined,
+    onEdit: () => {},
+    onSaveEdit: () => {},
+    onDeleted: () => {},
+    onCheck: () => {},
+  }
+
   render() {
     const { name, state, editing, date, id, onEdit, onSaveEdit, onDeleted, onCheck } = this.props
     return (
@@ -28,4 +41,16 @@ export default class Task extends Component {
       </li>
     )
   }
+}
+
+Task.propTypes = {
+  name: PropTypes.string,
+  state: PropTypes.string,
+  editing: PropTypes.bool,
+  date: PropTypes.object,
+  id: PropTypes.number,
+  onEdit: PropTypes.func,
+  onSaveEdit: PropTypes.func,
+  onDeleted: PropTypes.func,
+  onCheck: PropTypes.func,
 }
