@@ -1,20 +1,25 @@
-import React, { Component } from 'react'
+import React from 'react'
 
-export default class TaskFilter extends Component {
-  // eslint-disable-next-line class-methods-use-this
-  render() {
-    return (
-      <ul className="filters">
-        <li>
-          <button className="selected">All</button>
-        </li>
-        <li>
-          <button>Active</button>
-        </li>
-        <li>
-          <button>Completed</button>
-        </li>
-      </ul>
-    )
-  }
+const TaskFilter = ({ filterState, onSelect }) => {
+  return (
+    <ul className="filters">
+      <li>
+        <button className={filterState === 'all' ? 'selected' : ''} onClick={() => onSelect('all')}>
+          All
+        </button>
+      </li>
+      <li>
+        <button className={filterState === 'active' ? 'selected' : ''} onClick={() => onSelect('active')}>
+          Active
+        </button>
+      </li>
+      <li>
+        <button className={filterState === 'completed' ? 'selected' : ''} onClick={() => onSelect('completed')}>
+          Completed
+        </button>
+      </li>
+    </ul>
+  )
 }
+
+export default TaskFilter
