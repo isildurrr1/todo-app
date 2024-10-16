@@ -59,8 +59,8 @@ export default class App extends Component {
           state: undefined,
           editing: false,
           date: creationDate,
-          min: formData.min.value,
-          sec: formData.sec.value,
+          min: Number(formData.min.value),
+          sec: Number(formData.sec.value),
           id: Math.floor(Math.random() * 1000),
         }
         formData.reset()
@@ -90,6 +90,45 @@ export default class App extends Component {
     })
   }
 
+  startTimer = async (id) => {
+    const minId = setInterval(() => {
+      this.setState(({ tasks }) => {
+        const newTasks = tasks.map((task) => {
+          if (task.id === id) {
+            if (task.min === 0) {
+              clearInterval(minId)
+            } else {
+              return Object.assign(task, { min: task.min - 0.5 })
+            }
+          }
+          return task
+        })
+        return { tasks: newTasks }
+      })
+    }, 60000)
+    const secId = setInterval(() => {
+      this.setState(({ tasks }) => {
+        const newTasks = tasks.map((task) => {
+          if (task.id === id) {
+            if (task.sec === 0) {
+              clearInterval(secId)
+            } else {
+              return Object.assign(task, { sec: task.sec - 0.5 })
+            }
+          }
+          return task
+        })
+        return { tasks: newTasks }
+      })
+    }, 1000)
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  stopTimer = (id) => {
+    // eslint-disable-next-line no-console
+    console.log(id)
+  }
+
   render() {
     return (
       <section className="todoapp">
@@ -105,6 +144,8 @@ export default class App extends Component {
             onSaveEdit={(id, e) => this.saveEditedTask(id, e)}
             onDeleted={(id) => this.deleteItem(id)}
             onCheck={(id, checked) => this.completeItem(id, checked)}
+            onStartTimer={(id) => this.startTimer(id)}
+            onStopTimer={(id) => this.stopTimer(id)}
           />
           <Footer
             filterState={this.state.filter}

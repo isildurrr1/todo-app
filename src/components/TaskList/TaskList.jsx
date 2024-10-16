@@ -14,7 +14,7 @@ export default class TaskList extends Component {
   }
 
   render() {
-    const { data, filterState, onEdit, onSaveEdit, onDeleted, onCheck } = this.props
+    const { data, filterState, onEdit, onSaveEdit, onDeleted, onCheck, onStartTimer, onStopTimer } = this.props
     return (
       <ul className="todo-list">
         {data
@@ -36,6 +36,8 @@ export default class TaskList extends Component {
                 onSaveEdit={onSaveEdit}
                 onDeleted={onDeleted}
                 onCheck={onCheck}
+                onStart={onStartTimer}
+                onStop={onStopTimer}
               />
             )
           })}
