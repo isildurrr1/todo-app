@@ -10,11 +10,11 @@ export default class App extends Component {
     filter: undefined,
   }
 
-  editTask = (id) => {
+  editTask = (id, result) => {
     this.setState(({ tasks }) => {
       const newTasks = tasks.map((task) => {
         if (task.id === id) {
-          return Object.assign(task, { editing: true })
+          return Object.assign(task, { editing: result })
         }
         return task
       })
@@ -33,6 +33,8 @@ export default class App extends Component {
         })
         return { tasks: newTasks }
       })
+    } else if (e.code === 'Escape') {
+      this.editTask(id, false)
     }
   }
 
@@ -48,18 +50,20 @@ export default class App extends Component {
     })
   }
 
-  onInputSubmit = (e) => {
-    if (e.code === 'Enter' && e.target.value.trim() !== '') {
+  onInputSubmit = (formData) => {
+    if (formData.task.value.trim() !== '') {
       this.setState(({ tasks }) => {
         const creationDate = new Date()
         const newTask = {
-          name: e.target.value,
+          name: formData.task.value,
           state: undefined,
           editing: false,
           date: creationDate,
+          min: formData.min.value,
+          sec: formData.sec.value,
           id: Math.floor(Math.random() * 1000),
         }
-        e.target.value = ''
+        formData.reset()
         return tasks.length === 0 ? { tasks: [newTask] } : { tasks: [...tasks, newTask] }
       })
     }
@@ -97,7 +101,7 @@ export default class App extends Component {
           <TaskList
             data={this.state.tasks}
             filterState={this.state.filter}
-            onEdit={(id) => this.editTask(id)}
+            onEdit={(id, result) => this.editTask(id, result)}
             onSaveEdit={(id, e) => this.saveEditedTask(id, e)}
             onDeleted={(id) => this.deleteItem(id)}
             onCheck={(id, checked) => this.completeItem(id, checked)}

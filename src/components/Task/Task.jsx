@@ -9,6 +9,8 @@ export default class Task extends Component {
     editing: false,
     date: {},
     id: undefined,
+    min: 0,
+    sec: 0,
     onEdit: () => {},
     onSaveEdit: () => {},
     onDeleted: () => {},
@@ -16,7 +18,7 @@ export default class Task extends Component {
   }
 
   render() {
-    const { name, state, editing, date, id, onEdit, onSaveEdit, onDeleted, onCheck } = this.props
+    const { name, state, editing, date, id, min, sec, onEdit, onSaveEdit, onDeleted, onCheck } = this.props
     return (
       <li className={`${state} ${editing ? 'editing' : ''}`}>
         <div className="view">
@@ -27,14 +29,30 @@ export default class Task extends Component {
             defaultChecked={state === 'completed'}
           />
           <label>
-            <span className="description">{name}</span>
-            <span className="created">{formatDistanceStrict(new Date(), date)}</span>
+            <span className="title">{name}</span>
+            {min !== '' || sec !== '' ? (
+              <span className="description">
+                <button className="icon icon-play" />
+                <button className="icon icon-pause" />
+                {`${min === '' ? 0 : min}:${sec === '' ? 0 : sec}`}
+              </span>
+            ) : (
+              <></>
+            )}
+            <span className="description">{`created ${formatDistanceStrict(new Date(), date)} ago`}</span>
           </label>
-          <button className="icon icon-edit" onClick={() => onEdit(id)}></button>
+          <button className="icon icon-edit" onClick={() => onEdit(id, true)}></button>
           <button className="icon icon-destroy" onClick={() => onDeleted(id)}></button>
         </div>
         {editing ? (
-          <input type="text" className="edit" defaultValue={name} onKeyDown={(e) => onSaveEdit(id, e)} />
+          <input
+            type="text"
+            className="edit"
+            defaultValue={name}
+            autoFocus
+            onBlur={() => onEdit(id, false)}
+            onKeyDown={(e) => onSaveEdit(id, e)}
+          />
         ) : (
           <></>
         )}

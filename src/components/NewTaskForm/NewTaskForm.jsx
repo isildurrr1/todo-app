@@ -8,7 +8,20 @@ export default class NewTaskForm extends Component {
 
   render() {
     const { onEnterUp } = this.props
-    return <input className="new-todo" placeholder="What needs to be done?" autoFocus onKeyDown={onEnterUp} />
+    return (
+      <form
+        className="new-todo-form"
+        onSubmit={(e) => {
+          e.preventDefault()
+          onEnterUp(e.target)
+        }}
+      >
+        <input className="new-todo" placeholder="Task" name="task" autoFocus />
+        <input className="new-todo-form__timer" placeholder="Min" name="min" autoFocus type="number" />
+        <input className="new-todo-form__timer" placeholder="Sec" name="sec" autoFocus type="number" min={0} max={60} />
+        <button type="submit" />
+      </form>
+    )
   }
 }
 
