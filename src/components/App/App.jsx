@@ -61,6 +61,7 @@ export default class App extends Component {
           date: creationDate,
           min: Number(formData.min.value),
           sec: Number(formData.sec.value),
+          timerId: undefined,
           id: Math.floor(Math.random() * 1000),
         }
         formData.reset()
@@ -81,7 +82,7 @@ export default class App extends Component {
     this.setState(({ tasks }) => {
       const newTasks = tasks.map((task) => {
         if (task.id === id) {
-          const newState = checked ? { state: 'completed' } : { state: undefined }
+          const newState = checked ? { state: 'completed', min: 0, sec: 0 } : { state: undefined }
           return Object.assign(task, newState)
         }
         return task
@@ -90,43 +91,50 @@ export default class App extends Component {
     })
   }
 
-  startTimer = async (id) => {
-    const minId = setInterval(() => {
-      this.setState(({ tasks }) => {
-        const newTasks = tasks.map((task) => {
-          if (task.id === id) {
-            if (task.min === 0) {
-              clearInterval(minId)
-            } else {
-              return Object.assign(task, { min: task.min - 0.5 })
+  startTimer = (id) => {
+    const task = this.state.tasks.filter((el) => el.id === id)[0]
+    if (task.timerId === undefined) {
+      const intId = setInterval(() => {
+        this.setState(({ tasks }) => {
+          const newTasks = tasks.map((element) => {
+            if (element.id === id) {
+              if (element.sec === 0) {
+                if (element.min !== 0) {
+                  return { ...element, sec: 60, min: element.min - 1 }
+                }
+                clearInterval(intId)
+                return element
+              }
+              return { ...element, sec: element.sec - 1 }
             }
-          }
-          return task
+            return element
+          })
+          return { tasks: newTasks }
         })
-        return { tasks: newTasks }
-      })
-    }, 60000)
-    const secId = setInterval(() => {
-      this.setState(({ tasks }) => {
-        const newTasks = tasks.map((task) => {
-          if (task.id === id) {
-            if (task.sec === 0) {
-              clearInterval(secId)
-            } else {
-              return Object.assign(task, { sec: task.sec - 0.5 })
+        this.setState(({ tasks }) => {
+          const newTasks = tasks.map((element) => {
+            if (element.id === id) {
+              return { ...element, timerId: intId }
             }
-          }
-          return task
+            return element
+          })
+          return { tasks: newTasks }
         })
-        return { tasks: newTasks }
-      })
-    }, 1000)
+      }, 1000)
+    }
   }
 
-  // eslint-disable-next-line class-methods-use-this
   stopTimer = (id) => {
-    // eslint-disable-next-line no-console
-    console.log(id)
+    this.setState(({ tasks }) => {
+      const newTasks = tasks.map((element) => {
+        if (element.id === id) {
+          clearInterval(element.timerId)
+          return { ...element, timerId: undefined }
+        }
+        return element
+      })
+      return { tasks: newTasks }
+    })
   }
 
   render() {

@@ -1,3 +1,4 @@
+import { debounce } from 'lodash'
 import React, { Component } from 'react'
 import { formatDistanceStrict } from 'date-fns'
 import PropTypes from 'prop-types'
@@ -8,13 +9,20 @@ export default class Task extends Component {
     state: undefined,
     editing: false,
     date: {},
-    id: undefined,
     min: undefined,
     sec: undefined,
+    id: undefined,
     onEdit: () => {},
     onSaveEdit: () => {},
     onDeleted: () => {},
     onCheck: () => {},
+    onStart: () => {},
+    onStop: () => {},
+  }
+
+  componentWillUnmount() {
+    const { timerId } = this.props
+    clearInterval(timerId)
   }
 
   render() {
@@ -33,7 +41,7 @@ export default class Task extends Component {
           <label>
             <span className="title">{name}</span>
             <span className="description">
-              <button className="icon icon-play" onClick={() => onStart(id)} />
+              <button className="icon icon-play" onClick={debounce(() => onStart(id), 200)} />
               <button className="icon icon-pause" onClick={() => onStop(id)} />
               {`${!min ? 0 : min}:${!sec ? 0 : sec}`}
             </span>
@@ -65,8 +73,12 @@ Task.propTypes = {
   editing: PropTypes.bool,
   date: PropTypes.object,
   id: PropTypes.number,
+  min: PropTypes.number,
+  sec: PropTypes.number,
   onEdit: PropTypes.func,
   onSaveEdit: PropTypes.func,
   onDeleted: PropTypes.func,
   onCheck: PropTypes.func,
+  onStart: PropTypes.func,
+  onStop: PropTypes.func,
 }

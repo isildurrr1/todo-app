@@ -11,6 +11,8 @@ export default class TaskList extends Component {
     onSaveEdit: () => {},
     onDeleted: () => {},
     onCheck: () => {},
+    onStartTimer: () => {},
+    onStopTimer: () => {},
   }
 
   render() {
@@ -53,4 +55,6 @@ TaskList.propTypes = {
   onSaveEdit: PropTypes.func,
   onDeleted: PropTypes.func,
   onCheck: PropTypes.func,
+  onStartTimer: PropTypes.func,
+  onStopTimer: PropTypes.func,
 }
