@@ -1,168 +1,161 @@
-import React, { Component } from 'react'
+import React, { useEffect, useState } from 'react'
 
 import Footer from '../Footer/Footer'
 import TaskList from '../TaskList/TaskList'
 import NewTaskForm from '../NewTaskForm/NewTaskForm'
 
-export default class App extends Component {
-  state = {
-    tasks: [],
-    filter: undefined,
-  }
+const App = () => {
+  const [tasks, setTasks] = useState([])
+  const [filter, setFilter] = useState(undefined)
 
-  editTask = (id, result) => {
-    this.setState(({ tasks }) => {
-      const newTasks = tasks.map((task) => {
-        if (task.id === id) {
-          return Object.assign(task, { editing: result })
-        }
-        return task
-      })
-      return { tasks: newTasks }
+  useEffect(() => {
+    // eslint-disable-next-line no-console
+    console.log(tasks)
+  }, [tasks])
+
+  const editTask = (id, result) => {
+    const newTasks = tasks.map((task) => {
+      if (task.id === id) {
+        return Object.assign(task, { editing: result })
+      }
+      return task
     })
+    setTasks(newTasks)
   }
 
-  saveEditedTask = (id, e) => {
+  const saveEditedTask = (id, e) => {
     if (e.code === 'Enter' && e.target.value.trim() !== '') {
-      this.setState(({ tasks }) => {
-        const newTasks = tasks.map((task) => {
-          if (task.id === id) {
-            return Object.assign(task, { name: e.target.value, editing: false })
-          }
-          return task
-        })
-        return { tasks: newTasks }
-      })
-    } else if (e.code === 'Escape') {
-      this.editTask(id, false)
-    }
-  }
-
-  onFilterSelect = (newState) => {
-    this.setState(() => {
-      return { filter: newState }
-    })
-  }
-
-  clearCompleted = () => {
-    this.setState(({ tasks }) => {
-      return { tasks: tasks.filter((task) => task.state !== 'completed') }
-    })
-  }
-
-  onInputSubmit = (formData) => {
-    if (formData.task.value.trim() !== '') {
-      this.setState(({ tasks }) => {
-        const creationDate = new Date()
-        const newTask = {
-          name: formData.task.value,
-          state: undefined,
-          editing: false,
-          date: creationDate,
-          min: Number(formData.min.value),
-          sec: Number(formData.sec.value),
-          timerId: undefined,
-          id: Math.floor(Math.random() * 1000),
-        }
-        formData.reset()
-        return tasks.length === 0 ? { tasks: [newTask] } : { tasks: [...tasks, newTask] }
-      })
-    }
-  }
-
-  deleteItem = (id) => {
-    this.setState(({ tasks }) => {
-      const index = tasks.findIndex((el) => el.id === id)
-      const newTasks = tasks.toSpliced(index, 1)
-      return { tasks: newTasks }
-    })
-  }
-
-  completeItem = (id, checked) => {
-    this.setState(({ tasks }) => {
       const newTasks = tasks.map((task) => {
         if (task.id === id) {
-          const newState = checked ? { state: 'completed', min: 0, sec: 0 } : { state: undefined }
-          return Object.assign(task, newState)
+          return Object.assign(task, { name: e.target.value, editing: false })
         }
         return task
       })
-      return { tasks: newTasks }
-    })
+      setTasks(newTasks)
+    } else if (e.code === 'Escape') {
+      editTask(id, false)
+    }
   }
 
-  startTimer = (id) => {
-    const task = this.state.tasks.filter((el) => el.id === id)[0]
-    if (task.timerId === undefined) {
+  const onFilterSelect = (newState) => {
+    setFilter(newState)
+  }
+
+  const clearCompleted = () => {
+    setTasks(tasks.filter((task) => task.state !== 'completed'))
+  }
+
+  const onInputSubmit = (formData) => {
+    if (formData.task.value.trim() !== '') {
+      const creationDate = new Date()
+      const newTask = {
+        name: formData.task.value,
+        state: undefined,
+        editing: false,
+        date: creationDate,
+        min: Number(formData.min.value),
+        sec: Number(formData.sec.value),
+        timerId: undefined,
+        id: Math.floor(Math.random() * 1000),
+      }
+      formData.reset()
+      setTasks([...tasks, newTask])
+    }
+  }
+
+  const deleteItem = (id) => {
+    const index = tasks.findIndex((el) => el.id === id)
+    const newTasks = tasks.toSpliced(index, 1)
+    setTasks(newTasks)
+  }
+
+  const completeItem = (id, checked) => {
+    const newTasks = tasks.map((task) => {
+      if (task.id === id) {
+        const newState = checked ? { state: 'completed', min: 0, sec: 0 } : { state: undefined }
+        return Object.assign(task, newState)
+      }
+      return task
+    })
+    setTasks(newTasks)
+  }
+
+  const startTimer = (id) => {
+    const task = tasks.find((el) => el.id === id)
+    if (task && task.timerId === undefined) {
       const intId = setInterval(() => {
-        this.setState(({ tasks }) => {
-          const newTasks = tasks.map((element) => {
+        setTasks((prevTasks) => {
+          return prevTasks.map((element) => {
             if (element.id === id) {
-              if (element.sec === 0) {
-                if (element.min !== 0) {
-                  return { ...element, sec: 60, min: element.min - 1 }
-                }
-                clearInterval(intId)
-                return element
+              let newSec = element.sec - 1
+              let newMin = element.min
+
+              if (newSec < 0) {
+                newSec = 59
+                newMin -= 1
               }
-              return { ...element, sec: element.sec - 1 }
+
+              if (newMin < 0) {
+                clearInterval(intId)
+                return { ...element, sec: 0, min: 0, timerId: undefined, state: 'completed' } // завершите задачу
+              }
+
+              return { ...element, sec: newSec, min: newMin, timerId: intId }
             }
             return element
           })
-          return { tasks: newTasks }
-        })
-        this.setState(({ tasks }) => {
-          const newTasks = tasks.map((element) => {
-            if (element.id === id) {
-              return { ...element, timerId: intId }
-            }
-            return element
-          })
-          return { tasks: newTasks }
         })
       }, 1000)
+
+      setTasks((prevTasks) =>
+        prevTasks.map((element) => {
+          if (element.id === id) {
+            return { ...element, timerId: intId }
+          }
+          return element
+        })
+      )
     }
   }
 
-  stopTimer = (id) => {
-    this.setState(({ tasks }) => {
-      const newTasks = tasks.map((element) => {
+  const stopTimer = (id) => {
+    setTasks((prevTasks) =>
+      prevTasks.map((element) => {
         if (element.id === id) {
           clearInterval(element.timerId)
-          return { ...element, timerId: undefined }
+          return { ...element, timerId: undefined } // очищаем timerId
         }
         return element
       })
-      return { tasks: newTasks }
-    })
-  }
-
-  render() {
-    return (
-      <section className="todoapp">
-        <header className="header">
-          <h1>todos</h1>
-          <NewTaskForm onEnterUp={(e) => this.onInputSubmit(e)} />
-        </header>
-        <section className="main">
-          <TaskList
-            data={this.state.tasks}
-            filterState={this.state.filter}
-            onEdit={(id, result) => this.editTask(id, result)}
-            onSaveEdit={(id, e) => this.saveEditedTask(id, e)}
-            onDeleted={(id) => this.deleteItem(id)}
-            onCheck={(id, checked) => this.completeItem(id, checked)}
-            onStartTimer={(id) => this.startTimer(id)}
-            onStopTimer={(id) => this.stopTimer(id)}
-          />
-          <Footer
-            filterState={this.state.filter}
-            tasksState={this.state.tasks}
-            onSelect={(newState) => this.onFilterSelect(newState)}
-            onClearClick={() => this.clearCompleted()}
-          />
-        </section>
-      </section>
     )
   }
+
+  return (
+    <section className="todoapp">
+      <header className="header">
+        <h1>todos</h1>
+        <NewTaskForm onEnterUp={(e) => onInputSubmit(e)} />
+      </header>
+      <section className="main">
+        <TaskList
+          data={tasks}
+          filterState={filter}
+          onEdit={(id, result) => editTask(id, result)}
+          onSaveEdit={(id, e) => saveEditedTask(id, e)}
+          onDeleted={(id) => deleteItem(id)}
+          onCheck={(id, checked) => completeItem(id, checked)}
+          onStartTimer={(id) => startTimer(id)}
+          onStopTimer={(id) => stopTimer(id)}
+        />
+        <Footer
+          filterState={filter}
+          tasksState={tasks}
+          onSelect={(newState) => onFilterSelect(newState)}
+          onClearClick={() => clearCompleted()}
+        />
+      </section>
+    </section>
+  )
 }
+
+export default App
