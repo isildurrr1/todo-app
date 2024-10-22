@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 
 import Footer from '../Footer/Footer'
 import TaskList from '../TaskList/TaskList'
@@ -7,11 +7,6 @@ import NewTaskForm from '../NewTaskForm/NewTaskForm'
 const App = () => {
   const [tasks, setTasks] = useState([])
   const [filter, setFilter] = useState(undefined)
-
-  useEffect(() => {
-    // eslint-disable-next-line no-console
-    console.log(tasks)
-  }, [tasks])
 
   const editTask = (id, result) => {
     const newTasks = tasks.map((task) => {
@@ -97,7 +92,7 @@ const App = () => {
 
               if (newMin < 0) {
                 clearInterval(intId)
-                return { ...element, sec: 0, min: 0, timerId: undefined, state: 'completed' } // завершите задачу
+                return { ...element, sec: 0, min: 0, timerId: undefined, state: 'completed' }
               }
 
               return { ...element, sec: newSec, min: newMin, timerId: intId }
@@ -123,7 +118,7 @@ const App = () => {
       prevTasks.map((element) => {
         if (element.id === id) {
           clearInterval(element.timerId)
-          return { ...element, timerId: undefined } // очищаем timerId
+          return { ...element, timerId: undefined }
         }
         return element
       })
