@@ -1,5 +1,5 @@
 # todo-app
 
-Практическая задача ToDo
+Практическая задача ToDo на хуках
 
-## [Ссылка на Vercel](https://todo-app-git-timer-isildurrr1s-projects.vercel.app/)
+## [Ссылка на Vercel](https://todo-app-git-todo-hooks-isildurrr1s-projects.vercel.app/)
